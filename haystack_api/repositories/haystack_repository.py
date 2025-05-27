@@ -11,8 +11,8 @@ class HaystackRepository:
         self.index_name = index_name
         self.document_store = ElasticsearchDocumentStore(
             host="elasticsearch",
-            username="elastic",
-            password=os.getenv("ELASTIC_PASSWORD"),
+            # username="elastic",
+            # password=os.getenv("ELASTIC_PASSWORD"),
             index=index_name,
             embedding_dim=384
         )

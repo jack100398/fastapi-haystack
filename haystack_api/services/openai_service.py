@@ -4,6 +4,7 @@ import re
 
 openai.api_key = os.getenv("OPENAI_API_KEY", "")
 
+# 關鍵字補充
 def expand_query(query):
     prompt = f"請幫我擴充關鍵字: {query}"
     response = openai.ChatCompletion.create(
@@ -19,6 +20,7 @@ def expand_query(query):
 
     return f"{query} {keywords}"
 
+# 優化商品敘述
 def optimize_content(content):
     prompt = f"請優化以下商品描述，使其更具搜尋相關性:\n\"\"\"\n{content}\n\"\"\""
     response = openai.ChatCompletion.create(
@@ -28,6 +30,7 @@ def optimize_content(content):
     )
     return response.choices[0].message.content.strip()
 
+# 篩選搜尋結果
 def filter_results(query, results):
     # 整理結果內容
     items_text = "\n".join([f"- id:{item['meta'].get('id')} = {item['meta'].get('name')} ({item['content']})" for item in results])
