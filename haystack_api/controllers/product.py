@@ -6,6 +6,8 @@ from haystack.schema import Document
 from repositories.mysql_repository import MysqlRepository
 from repositories.haystack_repository import HaystackRepository
 
+from schemas.sync_request import SyncRequest
+
 router = APIRouter()
 
 haystack_repository = HaystackRepository(index_name="product")
@@ -32,3 +34,19 @@ def search_and_filter_by_openai(query: str, top_k: int = 5):
     results = haystack_repository.search(query, top_k)
 
     return {"query": query, "results": filter_results(query, [r.to_dict() for r in results])}
+
+@router.post('/sync')
+def sync(request: SyncRequest):
+    id = request.id
+
+    product = mysql_repository.get_by_id(id)
+
+    haystack_repository.write(product)
+
+    return {"id": id, "product": product}
+
+@router.delete('/sync/{id}')
+def sync(id: int):
+    haystack_repository.delete_by_ids([id])
+
+    return {"id": id}
