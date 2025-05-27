@@ -1,0 +1,34 @@
+services:
+  fastapi:
+    build:
+      context: .
+    container_name: fastapi_app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./haystack_api:/app
+    command: uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - mariadb
+  mariadb:
+    image: mariadb:10.3.39
+    volumes:
+      - ./volumes/data/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - default
+    restart: always
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.7.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false  # 暫時關閉安全性
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}     # 預設密碼（未啟用不會生效)
+    volumes:
+      - ./volumes/data/elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
